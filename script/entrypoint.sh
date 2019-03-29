@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# Docker socket for Docker Operator
+if [ -f /var/run/docker.sock ]; then
+	DOCKER_GROUP_ID=$(stat -c '%g' /var/run/docker.sock)
+	echo "Creating unix group 'docker' with group ID: ${DOCKER_GROUP_ID}"
+	groupadd -g $DOCKER_GROUP_ID docker
+	echo "Adding user 'airflow' to group 'docker'"
+	usermod -a -G docker airflow
+fi
+
 TRY_LOOP="20"
 
 : "${REDIS_HOST:="redis"}"
